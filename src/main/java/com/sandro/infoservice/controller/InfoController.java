@@ -27,4 +27,9 @@ public class InfoController {
     return "Hi there!";
   }
 
+  @GetMapping("/welcome")
+  public String welcome() {
+    return "Welcome to the Info Service!";
+  }
+
 }
