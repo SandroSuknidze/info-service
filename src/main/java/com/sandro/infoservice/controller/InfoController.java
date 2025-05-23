@@ -22,4 +22,9 @@ public class InfoController {
     return info;
   }
 
+  @GetMapping("/hi")
+  public String hi() {
+    return "Hi there!";
+  }
+
 }
