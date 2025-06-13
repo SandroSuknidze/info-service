@@ -1,6 +1,8 @@
 package com.sandro.infoservice.controller;
 
 import com.amazonaws.util.EC2MetadataUtils;
+import com.sandro.infoservice.ImageMetadata;
+import com.sandro.infoservice.ImageMetadataRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,18 +15,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class InfoController {
 
   private final S3Client s3Client;
+  private final ImageMetadataRepository imageMetadataRepository;
 
-  public InfoController() {
+  public InfoController(ImageMetadataRepository imageMetadataRepository) {
     s3Client = DependencyFactory.s3Client();
+    this.imageMetadataRepository = imageMetadataRepository;
   }
 
   @GetMapping("/info")
@@ -131,6 +138,10 @@ public class InfoController {
       userMetadata.put("file-extension", fileExtension);
 
 
+
+
+
+
       PutObjectRequest putObjectRequest = PutObjectRequest.builder()
           .bucket(bucketName)
           .key(fileName)
@@ -141,6 +152,14 @@ public class InfoController {
 
       PutObjectResponse response = s3Client.putObject(putObjectRequest,
           RequestBody.fromInputStream(file.getInputStream(), fileSizeInBytes));
+
+      ImageMetadata metadata = new ImageMetadata();
+      metadata.setName(fileName);
+      metadata.setSizeBytes(fileSizeInBytes);
+      metadata.setExtension(fileExtension);
+      metadata.setLastModified(Timestamp.from(currentTime));
+
+      imageMetadataRepository.save(metadata);
 
       Map<String, Object> result = new HashMap<>();
       result.put("message", "Image uploaded successfully");
@@ -178,5 +197,14 @@ public class InfoController {
       return "Error deleting file: " + e.getMessage();
     }
   }
+
+
+  @GetMapping("/metadata/{name}")
+  public ResponseEntity<?> getMetadata(@PathVariable String name) {
+    Optional<ImageMetadata> metadata = imageMetadataRepository.findByName(name);
+    return metadata.map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+  }
+
 
 }
