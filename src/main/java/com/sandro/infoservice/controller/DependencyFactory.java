@@ -14,7 +14,7 @@ public class DependencyFactory {
    */
   public static S3Client s3Client() {
     return S3Client.builder()
-        .credentialsProvider(ProfileCredentialsProvider.create("user2"))
+//        .credentialsProvider(ProfileCredentialsProvider.create("user2"))
         .region(Region.US_WEST_2)
         .httpClientBuilder(ApacheHttpClient.builder())
         .build();
