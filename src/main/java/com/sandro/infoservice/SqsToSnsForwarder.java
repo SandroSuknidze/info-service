@@ -2,6 +2,7 @@ package com.sandro.infoservice;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
@@ -25,6 +26,7 @@ public class SqsToSnsForwarder {
   @Value("${aws.sns.topic.arn}")
   private String snsArn;
 
+  @Scheduled(fixedRate = 60000) // every minute
   public void forwardMessages() {
     ReceiveMessageResponse response = sqsClient.receiveMessage(
         ReceiveMessageRequest.builder()
