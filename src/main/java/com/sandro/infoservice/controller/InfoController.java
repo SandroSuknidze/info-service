@@ -13,6 +13,9 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
@@ -22,6 +25,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -184,12 +188,32 @@ public class InfoController {
       ));
 
 
+
+
+
+      S3Presigner presigner = DependencyFactory.s3Presigner();
+      PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(
+          GetObjectPresignRequest.builder()
+              .getObjectRequest(GetObjectRequest.builder()
+                  .bucket(bucketName)
+                  .key(fileName)
+                  .build())
+              .signatureDuration(Duration.ofMinutes(15))
+              .build()
+      );
+
+      String downloadUrl = presignedRequest.url().toString();
+
+
+
+
+
       ObjectMapper objectMapper = new ObjectMapper();
       String jsonMessage = objectMapper.writeValueAsString(Map.of(
           "fileName", fileName,
           "size", fileSizeInBytes,
           "extension", fileExtension,
-          "downloadUrl", "https://" + bucketName + ".s3.amazonaws.com/" + fileName
+          "downloadUrl", downloadUrl
       ));
 
 
