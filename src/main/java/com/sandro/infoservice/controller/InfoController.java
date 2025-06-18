@@ -1,6 +1,7 @@
 package com.sandro.infoservice.controller;
 
 import com.amazonaws.util.EC2MetadataUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sandro.infoservice.DependencyFactory;
 import com.sandro.infoservice.ImageMetadata;
 import com.sandro.infoservice.ImageMetadataRepository;
@@ -182,9 +183,19 @@ public class InfoController {
           "fileExtension", fileExtension
       ));
 
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      String jsonMessage = objectMapper.writeValueAsString(Map.of(
+          "fileName", fileName,
+          "size", fileSizeInBytes,
+          "extension", fileExtension,
+          "downloadUrl", "https://" + bucketName + ".s3.amazonaws.com/" + fileName
+      ));
+
+
       sqsClient.sendMessage(SendMessageRequest.builder()
           .queueUrl(sqsUrl)
-          .messageBody(result.toString()) // include name, size, etc.
+          .messageBody(jsonMessage)
           .build());
 
       return ResponseEntity.ok(result);

@@ -26,7 +26,7 @@ public class SqsToSnsForwarder {
   @Value("${aws.sns.topic.arn}")
   private String snsArn;
 
-  @Scheduled(fixedRate = 60000) // every minute
+  @Scheduled(fixedRate = 30000)
   public void forwardMessages() {
     ReceiveMessageResponse response = sqsClient.receiveMessage(
         ReceiveMessageRequest.builder()
