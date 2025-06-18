@@ -1,8 +1,10 @@
 package com.sandro.infoservice.controller;
 
 import com.amazonaws.util.EC2MetadataUtils;
+import com.sandro.infoservice.DependencyFactory;
 import com.sandro.infoservice.ImageMetadata;
 import com.sandro.infoservice.ImageMetadataRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +12,8 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,10 +32,15 @@ public class InfoController {
 
   private final S3Client s3Client;
   private final ImageMetadataRepository imageMetadataRepository;
+  private final SqsClient sqsClient;
 
-  public InfoController(ImageMetadataRepository imageMetadataRepository) {
+  @Value("${aws.sqs.queue.url}")
+  private String sqsUrl;
+
+  public InfoController(ImageMetadataRepository imageMetadataRepository, SqsClient sqsClient) {
     s3Client = DependencyFactory.s3Client();
     this.imageMetadataRepository = imageMetadataRepository;
+    this.sqsClient = sqsClient;
   }
 
   @GetMapping("/info")
@@ -172,6 +181,11 @@ public class InfoController {
           "sizeInBytes", fileSizeInBytes,
           "fileExtension", fileExtension
       ));
+
+      sqsClient.sendMessage(SendMessageRequest.builder()
+          .queueUrl(sqsUrl)
+          .messageBody(result.toString()) // include name, size, etc.
+          .build());
 
       return ResponseEntity.ok(result);
     } catch (Exception e) {
