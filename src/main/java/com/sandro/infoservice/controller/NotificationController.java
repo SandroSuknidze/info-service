@@ -3,10 +3,7 @@ package com.sandro.infoservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.SubscribeRequest;
 import software.amazon.awssdk.services.sns.model.UnsubscribeRequest;
@@ -40,5 +37,10 @@ public class NotificationController {
         .subscriptionArn(subscriptionArn)
         .build());
     return "Unsubscribed successfully.";
+  }
+
+  @GetMapping("/test")
+  public String test() {
+    return "Test";
   }
 }
