@@ -1,6 +1,7 @@
 package com.sandro.infoservice;
 
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -38,8 +39,8 @@ public class SqsToSnsForwarder {
       snsClient.publish(PublishRequest.builder()
           .topicArn(snsArn)
           .subject("New Image Uploaded")
-//          .message(buildNotificationMessage(msg.body()))
-          .message(msg.body())
+          .message(buildNotificationMessage(msg.body()))
+//          .message(msg.body())
           .build());
 
       sqsClient.deleteMessage(DeleteMessageRequest.builder()
@@ -49,12 +50,12 @@ public class SqsToSnsForwarder {
     }
   }
 
-//  private String buildNotificationMessage(String json) {
-//    JSONObject obj = new JSONObject(json);
-//    return String.format("An image was uploaded!\nName: %s\nSize: %s bytes\nType: %s\nDownload: %s",
-//        obj.getString("fileName"),
-//        obj.getInt("size"),
-//        obj.getString("extension"),
-//        obj.getString("downloadUrl"));
-//  }
+  private String buildNotificationMessage(String json) {
+    JSONObject obj = new JSONObject(json);
+    return String.format("An image was uploaded!\nName: %s\nSize: %s bytes\nType: %s\nDownload: %s",
+        obj.getString("fileName"),
+        obj.getInt("size"),
+        obj.getString("extension"),
+        obj.getString("downloadUrl"));
+  }
 }
