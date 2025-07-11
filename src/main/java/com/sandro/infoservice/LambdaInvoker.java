@@ -23,7 +23,7 @@ public class LambdaInvoker {
   public String invoke() {
     InvokeRequest request = InvokeRequest.builder()
         .functionName(functionName)
-        .payload(SdkBytes.fromUtf8String("{\"detail-type\": \"triggered-from-web\"}"))
+        .payload(SdkBytes.fromUtf8String("{\"source\": \"triggered-from-web\"}"))
         .build();
 
     InvokeResponse response = lambdaClient.invoke(request);
