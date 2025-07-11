@@ -8,6 +8,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -19,7 +21,7 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 @Slf4j
 public class SqsToSnsForwarder {
