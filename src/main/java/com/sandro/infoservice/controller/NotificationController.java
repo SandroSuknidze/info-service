@@ -1,6 +1,7 @@
 package com.sandro.infoservice.controller;
 
 
+import com.sandro.infoservice.LambdaInvoker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ import software.amazon.awssdk.services.sns.model.UnsubscribeRequest;
 public class NotificationController {
 
   private final SnsClient snsClient;
+  private final LambdaInvoker lambdaInvoker;
+
 
   @Value("${aws.sns.topic.arn}")
   private String topicArn;
@@ -43,4 +46,10 @@ public class NotificationController {
   public String test() {
     return "Test";
   }
+
+  @GetMapping("/trigger-lambda")
+  public String triggerLambda() {
+    return lambdaInvoker.invoke();
+  }
+
 }
