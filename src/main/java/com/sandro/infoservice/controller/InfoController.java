@@ -48,6 +48,11 @@ public class InfoController {
     this.sqsClient = sqsClient;
   }
 
+  @GetMapping("/")
+  public ResponseEntity<String> index() {
+    return ResponseEntity.ok("OK");
+  }
+
   @GetMapping("/info")
   public Map<String, String> getInfo() {
     String az = EC2MetadataUtils.getAvailabilityZone();
