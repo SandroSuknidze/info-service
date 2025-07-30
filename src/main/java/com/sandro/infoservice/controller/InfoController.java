@@ -48,6 +48,12 @@ public class InfoController {
     this.sqsClient = sqsClient;
   }
 
+  @GetMapping("/number")
+  public ResponseEntity<String> number() {
+    return ResponseEntity.ok("1");
+  }
+
+
   @GetMapping("/")
   public ResponseEntity<String> index() {
     return ResponseEntity.ok("OK");
