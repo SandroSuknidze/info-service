@@ -1,4 +1,4 @@
-package com.sandro.infoservice;
+package com.sandro.infoservice.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

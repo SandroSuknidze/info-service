@@ -3,8 +3,9 @@ package com.sandro.infoservice.controller;
 import com.amazonaws.util.EC2MetadataUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sandro.infoservice.DependencyFactory;
-import com.sandro.infoservice.ImageMetadata;
+import com.sandro.infoservice.model.ImageMetadata;
 import com.sandro.infoservice.ImageMetadataRepository;
+import com.sandro.infoservice.service.ImageAnalyticsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,11 +39,14 @@ public class InfoController {
   private final S3Client s3Client;
   private final ImageMetadataRepository imageMetadataRepository;
   private final SqsClient sqsClient;
+  private final ImageAnalyticsService imageAnalyticsService;
 
   @Value("${aws.sqs.queue.url}")
   private String sqsUrl;
 
-  public InfoController(ImageMetadataRepository imageMetadataRepository, SqsClient sqsClient) {
+  public InfoController(ImageMetadataRepository imageMetadataRepository, SqsClient sqsClient,
+      ImageAnalyticsService imageAnalyticsService) {
+    this.imageAnalyticsService = imageAnalyticsService;
     s3Client = DependencyFactory.s3Client();
     this.imageMetadataRepository = imageMetadataRepository;
     this.sqsClient = sqsClient;
@@ -84,6 +88,14 @@ public class InfoController {
   @GetMapping("/file-download")
   public String fileDownload(@RequestParam String bucketName, @RequestParam String key) {
     try {
+
+      Optional<ImageMetadata> imageMetadata = imageMetadataRepository.findByName(key);
+      if (imageMetadata.isPresent()) {
+        Long imageId = imageMetadata.get().getId();
+        imageAnalyticsService.incrementDownloadCount(imageId);
+      }
+
+
       GetObjectRequest getObjectRequest = GetObjectRequest.builder()
           .bucket(bucketName)
           .key(key)
@@ -103,6 +115,14 @@ public class InfoController {
 
   @GetMapping("/show-metadata")
   public Object showMetadataByImage(@RequestParam String bucketName, @RequestParam String key) {
+
+    Optional<ImageMetadata> imageMetadata = imageMetadataRepository.findByName(key);
+    if (imageMetadata.isPresent()) {
+      Long imageId = imageMetadata.get().getId();
+      imageAnalyticsService.incrementViewCount(imageId);
+    }
+
+
     HeadObjectRequest getObjectRequest = HeadObjectRequest.builder()
         .bucket(bucketName)
         .key(key)
