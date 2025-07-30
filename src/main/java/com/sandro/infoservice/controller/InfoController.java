@@ -54,7 +54,7 @@ public class InfoController {
 
   @GetMapping("/number")
   public ResponseEntity<String> number() {
-    return ResponseEntity.ok("2");
+    return ResponseEntity.ok("3");
   }
 
 
