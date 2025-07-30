@@ -266,5 +266,13 @@ public class InfoController {
         .orElse(ResponseEntity.notFound().build());
   }
 
+  @GetMapping("/images")
+  public List<ImageMetadata> getImages() {
+    return imageMetadataRepository.findAll();
+  }
+
+  //TODO: per image view increment count
+  //TODO: per image download increment count
+
 
 }
