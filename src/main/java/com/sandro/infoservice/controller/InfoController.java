@@ -116,11 +116,6 @@ public class InfoController {
   @GetMapping("/show-metadata")
   public Object showMetadataByImage(@RequestParam String bucketName, @RequestParam String key) {
 
-    Optional<ImageMetadata> imageMetadata = imageMetadataRepository.findByName(key);
-    if (imageMetadata.isPresent()) {
-      Long imageId = imageMetadata.get().getId();
-      imageAnalyticsService.incrementViewCount(imageId);
-    }
 
 
     HeadObjectRequest getObjectRequest = HeadObjectRequest.builder()
@@ -282,6 +277,13 @@ public class InfoController {
   @GetMapping("/metadata/{name}")
   public ResponseEntity<?> getMetadata(@PathVariable String name) {
     Optional<ImageMetadata> metadata = imageMetadataRepository.findByName(name);
+
+    Optional<ImageMetadata> imageMetadata = imageMetadataRepository.findByName(name);
+    if (imageMetadata.isPresent()) {
+      Long imageId = imageMetadata.get().getId();
+      imageAnalyticsService.incrementViewCount(imageId);
+    }
+
     return metadata.map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
   }
