@@ -1,4 +1,4 @@
-FROM maven:3.9.6-eclipse-temurin-17 AS builder
+FROM public.ecr.aws/docker/library/maven:3.9.6-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY src ./src
 RUN mvn package -DskipTests
 
 
-FROM openjdk:17-jdk-slim
+FROM public.ecr.aws/docker/library/openjdk:17-jdk-slim
 
 WORKDIR /app
 
