@@ -29,6 +29,8 @@ phases:
       - echo Build completed on `date`
       - echo Pushing Docker image to ECR...
       - docker push 151182332702.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG 151182332702.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+      - docker push $ECR_REPO_URL:latest
       - echo Writing image definition file...
       - printf '[{"name":"sandro-suqnidze-spring-boot-container","imageUri":"151182332702.dkr.ecr.%s.amazonaws.com/%s:%s"}]' $AWS_REGION $IMAGE_REPO_NAME $IMAGE_TAG > imagedefinitions.json
 
